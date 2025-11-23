@@ -234,5 +234,128 @@ class UserCreditLimiter {
 }
 
 
+/*
+🟩 1. TOKEN BUCKET (Most common)
+💡 INTUITION:
 
+You have a bucket that fills with tokens at a fixed rate.
+
+bucket_capacity = max allowed tokens
+tokens refill steadily over time
+each request consumes 1 token
+if bucket empty → reject
+
+✔ Allows BURST traffic
+
+If bucket fills (say 10 tokens), user can send 10 requests instantly.
+
+✔ Smooth refill
+
+Tokens come back at a fixed refill rate.
+
+🎨 VISUAL
+tokens added → → → → [ bucket ] ← requests remove tokens
+
+
+Example:
+
+capacity = 5
+refill = 1 token per second
+
+
+After 5 seconds of no traffic → bucket is full → you can burst 5 requests instantly.
+
+🧠 Summary (Simple)
+Feature	Token Bucket
+Burst allowed?	YES
+Smooth requests?	YES
+Reject if bucket empty?	YES
+Refill tokens?	YES
+🟧 2. LEAKY BUCKET (Different purpose)
+💡 INTUITION:
+
+Water (requests) enters the bucket.
+Water leaks out at constant fixed rate.
+
+If too much water comes at once → bucket overflows → reject request.
+
+✔ Smooths the OUTPUT
+
+Even if requests come in bursts, output is smooth & regular.
+
+❌ NO burst allowed
+
+Everything is forced to leak out slowly.
+
+🎨 VISUAL
+requests → [ bucket ] → (drip drip drip…) → server
+
+
+Water drips out at constant speed.
+
+🧠 Summary (Simple)
+Feature	Leaky Bucket
+Burst allowed?	NO
+Output rate fixed?	YES
+Reject if bucket overflows?	YES
+Refill tokens?	NO (water leaks instead)
+🟥 THE REAL DIFFERENCE (INTERVIEW-WINNING ANSWER)
+⭐ Token Bucket:
+
+“Enforces average rate, but allows bursts.”
+
+⭐ Leaky Bucket:
+
+“Enforces constant rate, NO bursts.”
+
+This is EXACTLY what interviewers want.
+
+🎯 EXAMPLE (Side-by-Side)
+TOKEN BUCKET Example:
+capacity = 5
+refill = 1 token/sec
+
+Requests:
+- send 5 instantly → ALLOWED
+- sixth request → REJECT
+
+LEAKY BUCKET Example:
+leak_rate = 1 request/sec
+
+Requests:
+- send 5 instantly → only 1 goes through instantly
+- the rest wait or get rejected (depending implementation)
+
+🟦 Which one did we implement earlier?
+Your rate limiter (capacity, leakRate):
+tokens = tokens - leaked
+tokens++
+
+
+That is Leaky Bucket (constant leak).
+
+Your credit system (allow burst up to maxCapacity + credits):
+
+That becomes a Token Bucket.
+
+🟨 Interview cheat sheet you say verbally:
+
+If asked: "Explain Token Bucket"
+
+“A bucket refills tokens at a constant rate.
+Requests consume tokens.
+Allows burst traffic up to bucket size.”
+
+If asked: "Explain Leaky Bucket"
+
+“Requests go into bucket and leak out at constant rate.
+Limits output rate. No burst allowed.”
+
+If asked: "Which is better?"
+
+“For rate limiting API hits → token bucket (supports bursts).
+For smoothing traffic to downstream system → leaky bucket.”
+
+This is perfect Strong Hire answer.
+*/
 
